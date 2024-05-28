@@ -265,7 +265,7 @@ const handleSubmit = async (e) => {
         </div>
 
         <div className="flex -mx-3">
-          {registerRole === "student" ? (
+          {registerRole === "student" && (
             <div className="w-full px-3 mb-3">
               <label htmlFor="course" className="text-xs font-semibold px-1">
                 Course<span className="text-red-500">*</span>
@@ -285,7 +285,8 @@ const handleSubmit = async (e) => {
                 <option value="Ph. D.">Ph. D.</option>
               </select>
             </div>
-          ) : (
+          )}
+          {registerRole === "employee" && (
             <div className="w-full px-3 mb-3">
               <label htmlFor="course" className="text-xs font-semibold px-1">
                 Course<span className="text-red-500">*</span>
@@ -298,17 +299,17 @@ const handleSubmit = async (e) => {
                 className="w-full px-3 py-2 bg-white rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
                 required
               >
-                  <option value="">Select Department</option>
-                  <option value="Agronomy">Agronomy</option>
-                  <option value="Horticulture">Horticulture</option>
-                  <option value="Plant Pathology">Plant Pathology</option>
-                  <option value="Entomology">Entomology</option>
-                  <option value="Agricultural Engineering">
-                    Agricultural Engineering
-                  </option>
-                  <option value="Soil Science">Soil Science</option>
-                  <option value="Animal Husbandry">Animal Husbandry</option>
-                </select>
+                <option value="">Select Department</option>
+                <option value="Agronomy">Agronomy</option>
+                <option value="Horticulture">Horticulture</option>
+                <option value="Plant Pathology">Plant Pathology</option>
+                <option value="Entomology">Entomology</option>
+                <option value="Agricultural Engineering">
+                  Agricultural Engineering
+                </option>
+                <option value="Soil Science">Soil Science</option>
+                <option value="Animal Husbandry">Animal Husbandry</option>
+              </select>
             </div>
           )}
           <div className="w-full px-3 mb-2">

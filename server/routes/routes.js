@@ -28,19 +28,24 @@ const upload = multer({ storage: storage });
 const getNextSerialNumber = (role) => {
   try {
     // Fetch the current maximum serial number for the given role
-    const sql = `SELECT MAX(serial_number) AS max_serial FROM ${role}s`;
+    const sql = `SELECT MAX(id) AS max_id FROM ${role}s`;
     const result = connection.query(sql);
-    let maxSerial = result[0].max_serial || 0;
+
+    if (!result || !result[0] || result[0].max_id === null) {
+      // If no records found, start with id 1
+      return `BAU${new Date().getFullYear().toString().substr(0)}0001`;
+    }
+
+    let maxId = result[0].max_id;
 
     // Extract the current year
     const currentYear = new Date().getFullYear().toString().substr(-2);
 
-    // Extract the current serial number part and increment it
-    let currentSerial = parseInt(maxSerial.substr(-4)) || 0;
-    currentSerial++;
+    // Increment the maximum id
+    maxId++;
 
     // Format the new serial number
-    const newSerialNumber = `BAU${currentYear}${currentSerial
+    const newSerialNumber = `BAU${currentYear}${maxId
       .toString()
       .padStart(4, "0")}`;
 
@@ -49,6 +54,9 @@ const getNextSerialNumber = (role) => {
     throw error;
   }
 };
+
+
+
 
 // Login route
 router.post("/login", (req, res) => {
@@ -107,14 +115,18 @@ router.post("/register/user", upload.single("fileUpload"), (req, res) => {
       state,
       district,
     } = req.body;
-    const formattedDOB = new Date(dob).toISOString().split("T")[0];
 
+    const formattedDOB = new Date(dob).toISOString().split("T")[0];
     const image = req.file.filename; // Uploaded file name
+
+    // Generate serial number
+    const serialNumber = getNextSerialNumber("employee");
 
     // Insert user data into database
     const sql =
-      "INSERT INTO users (salutation, name, father_name, category, gender, dob, email, mobile_number, course, image, state, district) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+      "INSERT INTO users (serial_number, salutation, name, father_name, category, gender, dob, email, mobile_number, course, image, state, district) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     const values = [
+      serialNumber,
       salutation,
       name,
       fatherName,
@@ -128,6 +140,9 @@ router.post("/register/user", upload.single("fileUpload"), (req, res) => {
       state,
       district,
     ];
+
+   
+
 
     connection.query(sql, values, (err, result) => {
       if (err) {
@@ -144,7 +159,6 @@ router.post("/register/user", upload.single("fileUpload"), (req, res) => {
   }
 });
 
-
 router.post("/register/employee", upload.single("fileUpload"), (req, res) => {
   try {
     if (!req.file) {
@@ -156,12 +170,10 @@ router.post("/register/employee", upload.single("fileUpload"), (req, res) => {
       name,
       fatherName,
       department,
-      designation,
       dob,
       email,
       mobileNumber,
       password,
-    
     } = req.body;
     const formattedDOB = new Date(dob).toISOString().split("T")[0];
 
@@ -175,13 +187,12 @@ router.post("/register/employee", upload.single("fileUpload"), (req, res) => {
 
       // Insert employee data into database
       const sql =
-        "INSERT INTO employees (salutation, name, father_name, department, designation, dob, email, mobile_number, image, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        "INSERT INTO employees (salutation, name, father_name, department, dob, email, mobile_number, image, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
       const values = [
         salutation,
         name,
         fatherName,
         department,
-        designation,
         formattedDOB,
         email,
         mobileNumber,
