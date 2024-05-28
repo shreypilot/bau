@@ -51,15 +51,7 @@ const LoginForm = () => {
     }
   };
 
-  const handleRegisterSubmit = async (event) => {
-    event.preventDefault();
-    console.log("Register as", registerRole);
-    toast.success("Registration successful!", {
-      onClose: () => {
-        setView("login");
-      },
-    });
-  };
+
 
   const renderLogin = () => (
     <form onSubmit={handleSubmit}>
@@ -153,7 +145,6 @@ const LoginForm = () => {
               setView={setView}
               setRegisterRole={setRegisterRole}
               registerRole={registerRole}
-              handleRegisterSubmit={handleRegisterSubmit}
             />
           )}
           {view === "forgotPassword" && <ForgetPassword setView={setView} />}

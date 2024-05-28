@@ -5,7 +5,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import DateOfBirthInput from "./DateOfBirthInput";
 
-function RegisterForm({ setView, handleRegisterSubmit, registerRole,setRegisterRole }) {
+function RegisterForm({ setView, registerRole, setRegisterRole }) {
   const [formData, setFormData] = useState({
     salutation: "",
     name: "",
@@ -19,6 +19,9 @@ function RegisterForm({ setView, handleRegisterSubmit, registerRole,setRegisterR
     password: "",
     confirmPassword: "",
     fileUpload: null,
+    state: "",
+    district: "",
+    department: "",
   });
 
   const handleChange = (e) => {
@@ -30,41 +33,77 @@ function RegisterForm({ setView, handleRegisterSubmit, registerRole,setRegisterR
     setFormData({ ...formData, fileUpload: event.target.files[0] });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
+  if (
+    !formData.salutation ||
+    !formData.name ||
+    !formData.fatherName ||
+    !formData.category ||
+    !formData.gender ||
+    !formData.dob ||
+    !formData.email ||
+    !formData.mobileNumber ||
+    !formData.course ||
+    !formData.fileUpload
+  ) {
+    toast.error("Please fill in all the required fields.");
+    return;
+  }
+
+  // Additional validation based on role
+  if (registerRole === "student") {
+    if (!formData.state || !formData.district) {
+      toast.error("State and District are required for students.");
+      return;
+    }
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords do not match!");
       return;
     }
-
-    try {
-      const formDataToSend = new FormData();
-      Object.entries(formData).forEach(([key, value]) => {
-        if (key === "dob") {
-          value = value.toISOString().split("T")[0];
-        }
-        formDataToSend.append(key, value);
-      });
-
-      await axios.post("http://localhost:8002/register", formDataToSend);
-      toast.success("Registration successful!", {
-        onClose: () => {
-          window.location.href = "/login";
-        },
-      });
-    } catch (error) {
-      if (error.response) {
-        toast.error(error.response.data.error);
-      } else {
-        toast.error("Error occurred during registration.");
-      }
+  } else if (registerRole === "employee") {
+    if (!formData.password || !formData.confirmPassword) {
+      toast.error("Please enter both password fields for employees.");
+      return;
     }
-  };
+  }
+
+  try {
+    const formDataToSend = new FormData();
+    Object.entries(formData).forEach(([key, value]) => {
+      if (key === "dob") {
+        value = value.toISOString().split("T")[0];
+      }
+      formDataToSend.append(key, value);
+    });
+
+    let apiUrl = "";
+    if (registerRole === "student") {
+      apiUrl = "http://localhost:8002/register/user";
+    } else if (registerRole === "employee") {
+      apiUrl = "http://localhost:8002/register/employee";
+    }
+
+    await axios.post(apiUrl, formDataToSend);
+    toast.success("Registration successful!", {
+      onClose: () => {
+        setView("login");
+      },
+    });
+  } catch (error) {
+    if (error.response) {
+      toast.error(error.response.data.error);
+    } else {
+      toast.error("Error occurred during registration.");
+    }
+  }
+};
+
 
   return (
     <div>
-      <form onSubmit={handleSubmit}>
+      <form>
         <div className="mb-2 mx-1">
           <label className="text-xs font-semibold px-1 block">
             Register as:
@@ -94,6 +133,7 @@ function RegisterForm({ setView, handleRegisterSubmit, registerRole,setRegisterR
             <label htmlFor="employee">Employee</label>
           </div>
         </div>
+
         <div className="flex -mx-3">
           <div className="w-1/2 px-3 mb-2">
             <label htmlFor="salutation" className="text-xs  font-semibold px-1">
@@ -223,26 +263,54 @@ function RegisterForm({ setView, handleRegisterSubmit, registerRole,setRegisterR
             />
           </div>
         </div>
+
         <div className="flex -mx-3">
-          <div className="w-full px-3 mb-3">
-            <label htmlFor="course" className="text-xs font-semibold px-1">
-              Course<span className="text-red-500">*</span>
-            </label>
-            <select
-              id="course"
-              name="course"
-              value={formData.course}
-              onChange={handleChange}
-              className="w-full px-3 py-2 bg-white rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
-              required
-            >
-              <option value="">Select Course</option>
-              <option value="B. Sc. (Ag)">B. Sc. (Ag)</option>
-              <option value="B. Sc. (Hort)">B. Sc. (Hort)</option>
-              <option value="M. Sc. (Ag)">M. Sc. (Ag)</option>
-              <option value="Ph. D.">Ph. D.</option>
-            </select>
-          </div>
+          {registerRole === "student" ? (
+            <div className="w-full px-3 mb-3">
+              <label htmlFor="course" className="text-xs font-semibold px-1">
+                Course<span className="text-red-500">*</span>
+              </label>
+              <select
+                id="course"
+                name="course"
+                value={formData.course}
+                onChange={handleChange}
+                className="w-full px-3 py-2 bg-white rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
+                required
+              >
+                <option value="">Select Course</option>
+                <option value="B. Sc. (Ag)">B. Sc. (Ag)</option>
+                <option value="B. Sc. (Hort)">B. Sc. (Hort)</option>
+                <option value="M. Sc. (Ag)">M. Sc. (Ag)</option>
+                <option value="Ph. D.">Ph. D.</option>
+              </select>
+            </div>
+          ) : (
+            <div className="w-full px-3 mb-3">
+              <label htmlFor="course" className="text-xs font-semibold px-1">
+                Course<span className="text-red-500">*</span>
+              </label>
+              <select
+                id="department"
+                name="department"
+                value={formData.department}
+                onChange={handleChange}
+                className="w-full px-3 py-2 bg-white rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
+                required
+              >
+                  <option value="">Select Department</option>
+                  <option value="Agronomy">Agronomy</option>
+                  <option value="Horticulture">Horticulture</option>
+                  <option value="Plant Pathology">Plant Pathology</option>
+                  <option value="Entomology">Entomology</option>
+                  <option value="Agricultural Engineering">
+                    Agricultural Engineering
+                  </option>
+                  <option value="Soil Science">Soil Science</option>
+                  <option value="Animal Husbandry">Animal Husbandry</option>
+                </select>
+            </div>
+          )}
           <div className="w-full px-3 mb-2">
             <label htmlFor="fileUpload" className="text-xs font-semibold px-1">
               Upload Image<span className="text-red-500">*</span>
@@ -257,47 +325,93 @@ function RegisterForm({ setView, handleRegisterSubmit, registerRole,setRegisterR
             />
           </div>
         </div>
-        <div className="flex -mx-3">
-          <div className="w-full px-3 mb-3">
-            <label htmlFor="password" className="text-xs font-semibold px-1">
-              Password<span className="text-red-500">*</span>
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full px-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
-              placeholder="************"
-              required
-            />
-          </div>
-          <div className="w-full px-3 mb-2">
-            <label
-              htmlFor="confirmPassword"
-              className="text-xs font-semibold px-1"
-            >
-              Confirm Password<span className="text-red-500">*</span>
-            </label>
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              className="w-full px-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
-              placeholder="************"
-              required
-            />
-          </div>
-        </div>
+        {registerRole === "student" && (
+          <>
+            <div className="flex -mx-3">
+              <div className="w-1/2 px-3 mb-2">
+                <label htmlFor="state" className="text-xs font-semibold px-1">
+                  State<span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="state"
+                  name="state"
+                  value={formData.state}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
+                  placeholder="Enter State"
+                  required
+                />
+              </div>
+              <div className="w-1/2 px-3 mb-2">
+                <label
+                  htmlFor="district"
+                  className="text-xs font-semibold px-1"
+                >
+                  District<span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="district"
+                  name="district"
+                  value={formData.district}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
+                  placeholder="Enter District"
+                  required
+                />
+              </div>
+            </div>
+          </>
+        )}
+        {registerRole === "employee" && (
+          <>
+            <div className="flex -mx-3">
+              <div className="w-full px-3 mb-3">
+                <label
+                  htmlFor="password"
+                  className="text-xs font-semibold px-1"
+                >
+                  Password<span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
+                  placeholder="************"
+                  required
+                />
+              </div>
+              <div className="w-full px-3 mb-2">
+                <label
+                  htmlFor="confirmPassword"
+                  className="text-xs font-semibold px-1"
+                >
+                  Confirm Password<span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
+                  placeholder="************"
+                  required
+                />
+              </div>
+            </div>
+          </>
+        )}
         <div className="flex -mx-3">
           <div className="w-full px-3 mb-2">
             <button
               type="submit"
               className="block w-full bg-green-700 hover:bg-green-500 focus:bg-green-500 text-white rounded-lg px-3 py-3 font-semibold"
-              onClick={handleRegisterSubmit}
+              onClick={handleSubmit}
             >
               REGISTER NOW
             </button>

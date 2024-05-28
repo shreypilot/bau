@@ -25,7 +25,30 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+const getNextSerialNumber = (role) => {
+  try {
+    // Fetch the current maximum serial number for the given role
+    const sql = `SELECT MAX(serial_number) AS max_serial FROM ${role}s`;
+    const result = connection.query(sql);
+    let maxSerial = result[0].max_serial || 0;
 
+    // Extract the current year
+    const currentYear = new Date().getFullYear().toString().substr(-2);
+
+    // Extract the current serial number part and increment it
+    let currentSerial = parseInt(maxSerial.substr(-4)) || 0;
+    currentSerial++;
+
+    // Format the new serial number
+    const newSerialNumber = `BAU${currentYear}${currentSerial
+      .toString()
+      .padStart(4, "0")}`;
+
+    return newSerialNumber;
+  } catch (error) {
+    throw error;
+  }
+};
 
 // Login route
 router.post("/login", (req, res) => {
@@ -33,37 +56,39 @@ router.post("/login", (req, res) => {
     const { email, password } = req.body;
 
     // Fetch user record from the database based on the provided email
-    connection.query("SELECT * FROM users1 WHERE email = ? ", email, async (err, result) => {
-      if (err) {
-        throw err;
-      }
+    connection.query(
+      "SELECT * FROM users1 WHERE email = ? ",
+      email,
+      async (err, result) => {
+        if (err) {
+          throw err;
+        }
 
-      if (result.length === 0) {
-        // User not found
-        return res.status(404).json({ error: "User not found" });
-      }
+        if (result.length === 0) {
+          // User not found
+          return res.status(404).json({ error: "User not found" });
+        }
 
-      const user = result[0];
-      // Compare hashed password from the database with provided password
-      const passwordMatch = await bcrypt.compare(password, user.password);
+        const user = result[0];
+        // Compare hashed password from the database with provided password
+        const passwordMatch = await bcrypt.compare(password, user.password);
 
-      if (passwordMatch) {
-        // Passwords match, user authenticated
-        res.status(200).json({ message: "Login successful" });
-      } else {
-        // Passwords don't match
-        res.status(401).json({ error: "Incorrect password" });
+        if (passwordMatch) {
+          // Passwords match, user authenticated
+          res.status(200).json({ message: "Login successful" });
+        } else {
+          // Passwords don't match
+          res.status(401).json({ error: "Incorrect password" });
+        }
       }
-    });
+    );
   } catch (error) {
     console.error("Error occurred during login:", error);
     res.status(500).json({ error: "Error occurred during login" });
   }
 });
 
-
-// Register route
-router.post("/register", upload.single("fileUpload"), (req, res) => {
+router.post("/register/user", upload.single("fileUpload"), (req, res) => {
   try {
     if (!req.file) {
       throw new Error("No file uploaded");
@@ -79,7 +104,64 @@ router.post("/register", upload.single("fileUpload"), (req, res) => {
       email,
       mobileNumber,
       course,
+      state,
+      district,
+    } = req.body;
+    const formattedDOB = new Date(dob).toISOString().split("T")[0];
+
+    const image = req.file.filename; // Uploaded file name
+
+    // Insert user data into database
+    const sql =
+      "INSERT INTO users (salutation, name, father_name, category, gender, dob, email, mobile_number, course, image, state, district) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    const values = [
+      salutation,
+      name,
+      fatherName,
+      category,
+      gender,
+      formattedDOB,
+      email,
+      mobileNumber,
+      course,
+      image,
+      state,
+      district,
+    ];
+
+    connection.query(sql, values, (err, result) => {
+      if (err) {
+        console.error("Error occurred during user registration:", err);
+        return res
+          .status(500)
+          .json({ error: "Error occurred during user registration" });
+      }
+      res.status(200).json({ message: "User registered successfully" });
+    });
+  } catch (error) {
+    console.error("Error occurred during user registration:", error);
+    res.status(500).json({ error: "Error occurred during user registration" });
+  }
+});
+
+
+router.post("/register/employee", upload.single("fileUpload"), (req, res) => {
+  try {
+    if (!req.file) {
+      throw new Error("No file uploaded");
+    }
+
+    const {
+      salutation,
+      name,
+      fatherName,
+      department,
+      designation,
+      dob,
+      email,
+      mobileNumber,
       password,
+    
     } = req.body;
     const formattedDOB = new Date(dob).toISOString().split("T")[0];
 
@@ -91,19 +173,18 @@ router.post("/register", upload.single("fileUpload"), (req, res) => {
         throw err;
       }
 
-      // Insert user data into database
+      // Insert employee data into database
       const sql =
-        "INSERT INTO users1 (salutation, name, father_name, category, gender, dob, email, mobile_number, course, image, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        "INSERT INTO employees (salutation, name, father_name, department, designation, dob, email, mobile_number, image, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
       const values = [
         salutation,
         name,
         fatherName,
-        category,
-        gender,
+        department,
+        designation,
         formattedDOB,
         email,
         mobileNumber,
-        course,
         image,
         hash,
       ];
@@ -112,16 +193,16 @@ router.post("/register", upload.single("fileUpload"), (req, res) => {
         if (err) {
           throw err;
         }
-        res.status(200).json({ message: "User registered successfully" });
+        res.status(200).json({ message: "Employee registered successfully" });
       });
     });
   } catch (error) {
-    console.error("Error occurred during registration:", error);
-    res.status(500).json({ error: "Error occurred during registration" });
+    console.error("Error occurred during employee registration:", error);
+    res
+      .status(500)
+      .json({ error: "Error occurred during employee registration" });
   }
 });
-
-// get userdata
 
 router.get("/getusers", (req, res) => {
   connection.query("SELECT * FROM users1", (err, result) => {
