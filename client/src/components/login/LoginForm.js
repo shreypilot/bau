@@ -152,6 +152,7 @@ const LoginForm = () => {
             <RegisterForm
               setView={setView}
               setRegisterRole={setRegisterRole}
+              registerRole={registerRole}
               handleRegisterSubmit={handleRegisterSubmit}
             />
           )}

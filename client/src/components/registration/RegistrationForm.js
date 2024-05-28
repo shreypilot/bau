@@ -3,9 +3,9 @@ import React, { useState } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import DateOfBirthInput from "./DateOfBirthInput"; // Import the DateOfBirthInput component
+import DateOfBirthInput from "./DateOfBirthInput";
 
-function RegisterForm({ setView, handleRegisterSubmit }) {
+function RegisterForm({ setView, handleRegisterSubmit, registerRole,setRegisterRole }) {
   const [formData, setFormData] = useState({
     salutation: "",
     name: "",
@@ -65,6 +65,35 @@ function RegisterForm({ setView, handleRegisterSubmit }) {
   return (
     <div>
       <form onSubmit={handleSubmit}>
+        <div className="mb-2 mx-1">
+          <label className="text-xs font-semibold px-1 block">
+            Register as:
+          </label>
+          <div className="flex items-center">
+            <input
+              type="radio"
+              id="student"
+              name="role"
+              value="student"
+              checked={registerRole === "student"}
+              onChange={() => setRegisterRole("student")}
+              className="mr-2"
+            />
+            <label htmlFor="student" className="mr-4">
+              Student
+            </label>
+            <input
+              type="radio"
+              id="employee"
+              name="role"
+              value="employee"
+              checked={registerRole === "employee"}
+              onChange={() => setRegisterRole("employee")}
+              className="mr-2"
+            />
+            <label htmlFor="employee">Employee</label>
+          </div>
+        </div>
         <div className="flex -mx-3">
           <div className="w-1/2 px-3 mb-2">
             <label htmlFor="salutation" className="text-xs  font-semibold px-1">
