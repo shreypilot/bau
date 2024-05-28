@@ -5,6 +5,8 @@ import backgroundImage from "../../assets/background1.png";
 import "react-toastify/dist/ReactToastify.css";
 import ForgetPassword from "../forgetPassword/ForgetPassword";
 import RegisterForm from "../registration/RegistrationForm";
+import { useAuth } from "../context/AuthContext";
+
 const LoginForm = () => {
   const [values, setValues] = useState({
     email: "",
@@ -14,6 +16,7 @@ const LoginForm = () => {
   const [view, setView] = useState("login");
   const [registerRole, setRegisterRole] = useState("student");
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleInput = (event) => {
     setValues((prev) => ({
@@ -35,16 +38,17 @@ const LoginForm = () => {
 
       const data = await response.json();
 
-      if (response.ok) {
-        console.log("Login successful");
-        toast.success("Login successful!", {
-          onClose: () => {
-            navigate("/home");
-          },
-        });
-      } else {
-        setLoginError(data.error || "Login failed");
-      }
+       if (response.ok) {
+         console.log("Login successful");
+         toast.success("Login successful!", {
+           onClose: () => {
+             login(); // Call login function to update the auth context
+             navigate("/home");
+           },
+         });
+       } else {
+         setLoginError(data.error || "Login failed");
+       }
     } catch (error) {
       console.error("Error occurred during login:", error);
       toast.error("Invalid email and password");

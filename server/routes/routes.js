@@ -55,9 +55,6 @@ const getNextSerialNumber = (role) => {
   }
 };
 
-
-
-
 // Login route
 router.post("/login", (req, res) => {
   try {
@@ -65,7 +62,7 @@ router.post("/login", (req, res) => {
 
     // Fetch user record from the database based on the provided email
     connection.query(
-      "SELECT * FROM users1 WHERE email = ? ",
+      "SELECT * FROM employees WHERE email = ? ",
       email,
       async (err, result) => {
         if (err) {
@@ -141,9 +138,6 @@ router.post("/register/user", upload.single("fileUpload"), (req, res) => {
       district,
     ];
 
-   
-
-
     connection.query(sql, values, (err, result) => {
       if (err) {
         console.error("Error occurred during user registration:", err);
@@ -216,7 +210,7 @@ router.post("/register/employee", upload.single("fileUpload"), (req, res) => {
 });
 
 router.get("/getusers", (req, res) => {
-  connection.query("SELECT * FROM users1", (err, result) => {
+  connection.query("SELECT * FROM users", (err, result) => {
     if (err) {
       res.status(422).json("no data available");
     } else {
