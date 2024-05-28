@@ -1,0 +1,86 @@
+.gi-2x{font-size: 2em;}
+.gi-3x{font-size: 3em;}
+.gi-4x{font-size: 4em;}
+.gi-5x{font-size: 5em;}
+
+.btn {
+  border-width: 0;
+  border-radius: 3px;
+  color: #2B3335;
+}
+
+.btn-a {
+  background-color: #CFBBA9;
+}
+
+.btn-b {
+  background-color: #AC9785;
+}
+
+.btn-c {
+  background-color: #4E5356;
+}
+
+.btn-c span,
+.btn-c {
+  color: #C5B1A7;
+  font-weight: normal;
+  font-size: 1em;
+  line-height: 1em;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+section {
+  padding: 150px 0;
+  color: #2B3335;
+}
+
+.section-services {
+  background: #EBEDEC;
+}
+
+.section-contact {
+  background: #C5B1A7;
+}
+
+.section-contact a {
+  color: #2B3335;
+  font-size: 1.5em;
+}
+
+.font-weight-normal {
+  font-weight: normal;
+}
+
+.font-weight-bold {
+  font-weight: bold;
+}
+
+section.jumbotron {
+  background-image: url(http://previews.123rf.com/images/rido/rido1506/rido150600049/41262919-Closeup-shot-of-laptop-with-digitaltablet-and-smartphone-on-desk-Modern-devices-on-desk-at-office-Th-Stock-Photo.jpg);
+  background-size: cover;
+  background-position: center center;
+  color: white;
+  position: relative;
+  margin: 0;
+}
+
+section.jumbotron .container {
+  padding: 200px 0;
+}
+
+section.jumbotron:before {
+  content: "";
+  position: absolute;
+  opacity: .5;
+  background: #000;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+section.jumbotron .container {
+  position: relative;
+}
