@@ -78,7 +78,7 @@ router.post("/register/user", upload.single("fileUpload"), (req, res) => {
     const sql =
       "INSERT INTO student_info (serial_number, salutation, name, father_name, category, gender, formatted_dob, email, mobile_number, course, image, state, district) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     const values = [
-      null, // serial_number should be auto-generated
+      serial_number,
       salutation,
       name,
       fatherName,
@@ -108,25 +108,52 @@ router.post("/register/user", upload.single("fileUpload"), (req, res) => {
   }
 });
 
-router.post("/register/employee", async (req, res) => {
+router.post("/register/employee", upload.single("fileUpload"), (req, res) => {
   try {
-    const { email, password } = req.body;
+    if (!req.file) {
+      throw new Error("No file uploaded");
+    }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const {
+      salutation,
+      name,
+      fatherName,
+      department,
+      dob,
+      email,
+      mobileNumber,
+      password,
+    } = req.body;
+    const formattedDOB = new Date(dob).toISOString().split("T")[0];
 
-    connection.query(
-      "INSERT INTO employees (email, password) VALUES (?, ?)",
-      [email, hashedPassword],
-      (err, result) => {
+    const image = req.file.filename; 
+
+    bcrypt.hash(password, 10, (err, hash) => {
+      if (err) {
+        throw err;
+      }
+
+      const sql =
+        "INSERT INTO employees (salutation, name, father_name, department, dob, email, mobile_number, image, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+      const values = [
+        salutation,
+        name,
+        fatherName,
+        department,
+        formattedDOB,
+        email,
+        mobileNumber,
+        image,
+        hash,
+      ];
+
+      connection.query(sql, values, (err, result) => {
         if (err) {
-          console.error("Error occurred during employee registration:", err);
-          return res
-            .status(500)
-            .json({ error: "Error occurred during employee registration" });
+          throw err;
         }
         res.status(200).json({ message: "Employee registered successfully" });
-      }
-    );
+      });
+    });
   } catch (error) {
     console.error("Error occurred during employee registration:", error);
     res

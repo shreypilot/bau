@@ -13,6 +13,8 @@
     "@testing-library/user-event": "^13.5.0",
     "autoprefixer": "^10.4.19",
     "bootstrap": "^5.3.3",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.2",
     "mdb-react-ui-kit": "^8.0.0",
     "postcss": "^8.4.38",
     "react": "^18.3.1",

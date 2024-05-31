@@ -53,7 +53,6 @@ const Dashboard = () => {
       const deletedData = await response.json();
       console.log("User deleted:", deletedData);
 
-      // Update the state to remove the deleted user
       setData(data.filter((user) => user.id !== selectedUserId));
       setShowDeleteModal(false); // Close the delete modal
     } catch (error) {

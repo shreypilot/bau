@@ -26,7 +26,16 @@ router.get("/getusers", (req, res) => {
     }
   });
 });
-
+router.get("/student_result", (req, res) => {
+  connection.query("SELECT * FROM student_result", (err, result) => {
+    if (err) {
+      console.error("Error occurred while fetching users:", err);
+      res.status(500).json({ error: "Error occurred while fetching users" });
+    } else {
+      res.status(200).json(result);
+    }
+  });
+});
 router.delete("/deleteuser/:id", (req, res) => {
   const { id } = req.params;
   connection.query(
