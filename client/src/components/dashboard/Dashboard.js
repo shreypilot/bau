@@ -9,6 +9,8 @@ const Dashboard = () => {
   const [data, setData] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState(null); // State to track the selected user ID for deletion
   const [showDeleteModal, setShowDeleteModal] = useState(false); // State to track whether the delete modal is open
+  const [showDetailModal, setShowDetailModal] = useState(false); // State to track whether the detail modal is open
+  const [selectedUser, setSelectedUser] = useState(null); // State to store the selected user details
 
   useEffect(() => {
     fetchData();
@@ -59,8 +61,17 @@ const Dashboard = () => {
     }
   };
 
-  const closeModal = () => {
+  const closeDeleteModal = () => {
     setShowDeleteModal(false); // Close the delete modal
+  };
+
+  const viewUserDetails = (user) => {
+    setSelectedUser(user); // Set the selected user details
+    setShowDetailModal(true); // Open the detail modal
+  };
+
+  const closeDetailModal = () => {
+    setShowDetailModal(false); // Close the detail modal
   };
 
   return (
@@ -81,11 +92,47 @@ const Dashboard = () => {
               </button>
               <button
                 className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                onClick={closeModal}
+                onClick={closeDeleteModal}
               >
                 No, Cancel
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {showDetailModal && selectedUser && (
+        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="p-6 relative rounded-lg shadow-lg text-black bg-white">
+            <div className=" cursor-pointer absolute top-0 right-2 text-2xl font-bold" onClick={closeDetailModal}>&times;</div>
+            <div className="mb-2">
+              <img
+                className="w-16 h-16 rounded-full block mx-auto"
+                src={BAU}
+                alt="User avatar"
+              />
+            </div>
+            <div className="flex justify-between">
+              <div className="mb-2 ">
+                <strong>ID:</strong> {selectedUser.serial_number}
+              </div>
+              <div className="mb-2">
+                <strong>Name:</strong> {selectedUser.name}
+              </div>
+            </div>
+            <div className="flex justify-between">
+              <div className="mb-2">
+                <strong>Father Name:</strong> {selectedUser.father_name}
+              </div>
+              <div className="mb-2 px-4">
+                <strong>Gender:</strong> {selectedUser.gender}
+              </div>
+            </div>
+            <div className="mb-2">
+              <strong>Email:</strong> {selectedUser.email}
+            </div>
+
+           
           </div>
         </div>
       )}
@@ -151,6 +198,7 @@ const Dashboard = () => {
                     <button
                       className="btn btn-success mr-5"
                       style={{ padding: "0.25rem 0.1rem", fontSize: "0.4rem" }}
+                      onClick={() => viewUserDetails(item)}
                     >
                       <RemoveRedEyeIcon />
                     </button>
