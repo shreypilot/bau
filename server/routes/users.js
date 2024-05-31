@@ -39,7 +39,7 @@ router.get("/student_result", (req, res) => {
 router.delete("/deleteuser/:id", (req, res) => {
   const { id } = req.params;
   connection.query(
-    "DELETE FROM student_info WHERE id = ?",
+    "DELETE FROM student_info WHERE serial_number = ?",
     id,
     (err, result) => {
       if (err) {

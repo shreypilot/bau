@@ -59,6 +59,7 @@ router.post("/register/user", upload.single("fileUpload"), (req, res) => {
     }
 
     const {
+      serial_number,
       salutation,
       name,
       fatherName,

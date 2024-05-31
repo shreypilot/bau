@@ -53,7 +53,7 @@ const Dashboard = () => {
       const deletedData = await response.json();
       console.log("User deleted:", deletedData);
 
-      setData(data.filter((user) => user.id !== selectedUserId));
+      setData(data.filter((user) => user.serial_number !== selectedUserId));
       setShowDeleteModal(false); 
     } catch (error) {
       console.error("Error deleting user:", error);
@@ -102,7 +102,12 @@ const Dashboard = () => {
       {showDetailModal && selectedUser && (
         <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="p-6 relative rounded-lg shadow-lg text-black bg-white">
-            <div className=" cursor-pointer absolute top-0 right-2 text-2xl font-bold" onClick={closeDetailModal}>&times;</div>
+            <div
+              className=" cursor-pointer absolute top-0 right-2 text-2xl font-bold"
+              onClick={closeDetailModal}
+            >
+              &times;
+            </div>
             <div className="mb-2">
               <img
                 className="w-16 h-16 rounded-full block mx-auto"
@@ -129,8 +134,6 @@ const Dashboard = () => {
             <div className="mb-2">
               <strong>Email:</strong> {selectedUser.email}
             </div>
-
-           
           </div>
         </div>
       )}
@@ -215,7 +218,7 @@ const Dashboard = () => {
                     <button
                       className="btn btn-danger"
                       style={{ padding: "0.25rem 0.1rem", fontSize: "0.4rem" }}
-                      onClick={() => deleteUser(item.id)}
+                      onClick={() => deleteUser(item.serial_number)}
                     >
                       <DeleteOutlineIcon />
                     </button>

@@ -102,7 +102,7 @@ const Dashboard = () => {
             </tbody>
           </table>
           <div className="flex justify-end w-11/12 mx-auto">
-            <button className="btn btn-danger px-8 my-8" onClick={downloadPDF}>
+            <button className="btn btn-Primary px-8 my-8" onClick={downloadPDF}>
               Download PDF
             </button>
           </div>
