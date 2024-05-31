@@ -69,20 +69,41 @@ router.get("/induser/:id", (req, res) => {
 });
 
 router.get("/searchusers", (req, res) => {
-  const { name } = req.query;
-  connection.query(
-    "SELECT * FROM student_info WHERE name LIKE ?",
-    `%${name}%`,
-    (err, result) => {
-      if (err) {
-        console.error("Error occurred while searching users:", err);
-        res.status(500).json({ error: "Error occurred while searching users" });
-      } else {
-        res.status(200).json(result);
-      }
+  const { query } = req;
+  const { name, serial_number } = query;
+
+  if (!name && !serial_number) {
+    return res
+      .status(400)
+      .json({ error: "Name or serial number is required for search" });
+  }
+
+  let sql = "SELECT * FROM student_info WHERE";
+  let params = [];
+
+  if (name) {
+    sql += " name LIKE ?";
+    params.push(`%${name}%`);
+  }
+
+  if (serial_number) {
+    if (params.length > 0) {
+      sql += " OR";
     }
-  );
+    sql += " serial_number = ?";
+    params.push(serial_number);
+  }
+
+  connection.query(sql, params, (err, result) => {
+    if (err) {
+      console.error("Error occurred while searching users:", err);
+      res.status(500).json({ error: "Error occurred while searching users" });
+    } else {
+      res.status(200).json(result);
+    }
+  });
 });
+
 
 router.patch("/updateuser/:id", upload.single("image"), (req, res) => {
   const { id } = req.params;

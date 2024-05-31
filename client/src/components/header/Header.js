@@ -8,14 +8,10 @@ import "./header.css";
 
 const Header = () => {
   const [isProfileOptionsOpen, setProfileOptionsOpen] = useState(false);
- 
 
   const handleProfileOptionClick = () => {
     setProfileOptionsOpen(!isProfileOptionsOpen);
   };
-
-
-
 
   return (
     <nav className="bg-green-500 py-2 h-28 flex items-center px-4 sticky top-0">
@@ -28,8 +24,7 @@ const Header = () => {
         <div className="mx-4">
           <Link to="/home">Home</Link>
         </div>
-    
-       
+
         <div className="flex rounded-lg p-1">
           <CgProfile
             size={36}
@@ -42,7 +37,7 @@ const Header = () => {
             onClick={handleProfileOptionClick}
           />
         </div>
-       
+
         {isProfileOptionsOpen && (
           <div className="absolute right-0 top-3 mt-10 w-48 bg-white rounded-lg shadow-lg z-10">
             <div className="py-2 px-2">

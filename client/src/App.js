@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+
 import {
   BrowserRouter as Router,
   Routes,
@@ -17,12 +18,16 @@ import ResultDashboard from "./components/dashboard/ResultDashboard";
 const Layout = ({ children }) => {
   const location = useLocation();
   const isLoginPage = location.pathname === "/";
-    
+  const [searchResults, setSearchResults] = useState([]);
+
+  const handleSearchResults = (results) => {
+    setSearchResults(results);
+  };
 
   return (
     <>
-      {!isLoginPage && <Header  />}
-      {children}
+      {!isLoginPage && <Header onSearchResults={handleSearchResults} />}
+      {React.cloneElement(children, { searchResults })}
       {!isLoginPage && <Footer />}
     </>
   );
