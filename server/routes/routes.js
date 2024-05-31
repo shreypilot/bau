@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const multer = require("multer");
 const bcrypt = require("bcrypt");
 const cors = require("cors"); // Import the CORS middleware
+const jwt = require("jsonwebtoken");
 
 // Database connection
 const connection = require("../config/db");
@@ -56,7 +57,9 @@ const getNextSerialNumber = (role) => {
 };
 
 // Login route
-router.post("/login", (req, res) => {
+
+// Login route
+router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -80,7 +83,13 @@ router.post("/login", (req, res) => {
 
         if (passwordMatch) {
           // Passwords match, user authenticated
-          res.status(200).json({ message: "Login successful" });
+          // Generate JWT token
+          const token = jwt.sign({ userId: user.id }, "your_secret_key_here", {
+            expiresIn: "1h", // Token expiration time
+          });
+
+          // Send the token as a response
+          res.status(200).json({ message: "Login successful", token });
         } else {
           // Passwords don't match
           res.status(401).json({ error: "Incorrect password" });
@@ -92,6 +101,7 @@ router.post("/login", (req, res) => {
     res.status(500).json({ error: "Error occurred during login" });
   }
 });
+
 
 router.post("/register/user", upload.single("fileUpload"), (req, res) => {
   try {
@@ -121,7 +131,7 @@ router.post("/register/user", upload.single("fileUpload"), (req, res) => {
 
     // Insert user data into database
     const sql =
-      "INSERT INTO users (serial_number, salutation, name, father_name, category, gender, dob, email, mobile_number, course, image, state, district) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+      "INSERT INTO student_info (serial_number, salutation, name, father_name, category, gender, dob, email, mobile_number, course, image, state, district) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     const values = [
       serialNumber,
       salutation,
@@ -210,7 +220,7 @@ router.post("/register/employee", upload.single("fileUpload"), (req, res) => {
 });
 
 router.get("/getusers", (req, res) => {
-  connection.query("SELECT * FROM users", (err, result) => {
+  connection.query("SELECT * FROM student_info", (err, result) => {
     if (err) {
       res.status(422).json("no data available");
     } else {
@@ -224,28 +234,60 @@ router.get("/getusers", (req, res) => {
 router.delete("/deleteuser/:id", (req, res) => {
   const { id } = req.params;
 
-  connection.query("DELETE FROM users1 WHERE id = ? ", id, (err, result) => {
-    if (err) {
-      res.status(422).json("error");
-    } else {
-      res.status(201).json(result);
+  connection.query(
+    "DELETE FROM student_info WHERE id = ? ",
+    id,
+    (err, result) => {
+      if (err) {
+        res.status(422).json("error");
+      } else {
+        res.status(201).json(result);
+      }
     }
-  });
+  );
 });
 // get single user
 
 router.get("/induser/:id", (req, res) => {
   const { id } = req.params;
 
-  connection.query("SELECT * FROM users1 WHERE id = ? ", id, (err, result) => {
+  connection.query(
+    "SELECT * FROM student_info WHERE id = ? ",
+    id,
+    (err, result) => {
+      if (err) {
+        res.status(422).json("error");
+      } else {
+        res.status(201).json(result);
+      }
+    }
+  );
+});
+router.get("/searchusers", (req, res) => {
+  const { name, serial_number } = req.query;
+
+  let sql = "SELECT * FROM student_info WHERE 1=1";
+  const values = [];
+
+  if (name) {
+    sql += " AND name LIKE ?";
+    values.push(`%${name}%`);
+  }
+
+  if (serial_number) {
+    sql += " AND serial_number = ?";
+    values.push(serial_number);
+  }
+
+  connection.query(sql, values, (err, result) => {
     if (err) {
-      res.status(422).json("error");
+      console.error("Error occurred during user search:", err);
+      res.status(500).json({ error: "Error occurred during user search" });
     } else {
-      res.status(201).json(result);
+      res.status(200).json(result);
     }
   });
 });
-
 // update users api
 router.patch("/updateuser/:id", upload.single("image"), async (req, res) => {
   try {
@@ -272,7 +314,7 @@ router.patch("/updateuser/:id", upload.single("image"), async (req, res) => {
     }
 
     const sql = `
-      UPDATE users1
+      UPDATE student_info
       SET salutation = ?,
           name = ?,
           father_name = ?,
@@ -283,6 +325,8 @@ router.patch("/updateuser/:id", upload.single("image"), async (req, res) => {
           mobile_number = ?,
           course = ?,
           image = ?
+          state = ?
+          district = ?
       WHERE id = ?
     `;
 

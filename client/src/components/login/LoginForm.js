@@ -42,7 +42,7 @@ const LoginForm = () => {
          console.log("Login successful");
          toast.success("Login successful!", {
            onClose: () => {
-             login(); // Call login function to update the auth context
+        login(data.token);
              navigate("/home");
            },
          });

@@ -17,8 +17,8 @@ connection.connect((err) => {
   console.log('Connected to database.');
 
   const createTableQuery = `
-  CREATE TABLE IF NOT EXISTS users1 (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+  CREATE TABLE IF NOT EXISTS student_info (
+ id INT AUTO_INCREMENT PRIMARY KEY,
     salutation VARCHAR(10),
     name VARCHAR(255) NOT NULL,
     father_name VARCHAR(255) NOT NULL,  
@@ -29,10 +29,13 @@ connection.connect((err) => {
     mobile_number VARCHAR(15) NOT NULL,
     course VARCHAR(100) NOT NULL,
     image VARCHAR(255) NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    serial_number VARCHAR(20),
+    state VARCHAR(50),
+    district VARCHAR(50)
   );
-  
+ 
+
   `;
 
   connection.query(createTableQuery, (err, results, fields) => {
