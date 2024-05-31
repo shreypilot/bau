@@ -7,10 +7,10 @@ import { NavLink } from "react-router-dom";
 
 const Dashboard = () => {
   const [data, setData] = useState([]);
-  const [selectedUserId, setSelectedUserId] = useState(null); // State to track the selected user ID for deletion
-  const [showDeleteModal, setShowDeleteModal] = useState(false); // State to track whether the delete modal is open
-  const [showDetailModal, setShowDetailModal] = useState(false); // State to track whether the detail modal is open
-  const [selectedUser, setSelectedUser] = useState(null); // State to store the selected user details
+  const [selectedUserId, setSelectedUserId] = useState(null); 
+  const [showDeleteModal, setShowDeleteModal] = useState(false); 
+  const [showDetailModal, setShowDetailModal] = useState(false); 
+  const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -30,8 +30,8 @@ const Dashboard = () => {
   };
 
   const deleteUser = async (id) => {
-    setSelectedUserId(id); // Set the selected user ID
-    setShowDeleteModal(true); // Open the delete modal
+    setSelectedUserId(id); 
+    setShowDeleteModal(true); 
   };
 
   const confirmDeleteUser = async () => {
@@ -54,28 +54,27 @@ const Dashboard = () => {
       console.log("User deleted:", deletedData);
 
       setData(data.filter((user) => user.id !== selectedUserId));
-      setShowDeleteModal(false); // Close the delete modal
+      setShowDeleteModal(false); 
     } catch (error) {
       console.error("Error deleting user:", error);
     }
   };
 
   const closeDeleteModal = () => {
-    setShowDeleteModal(false); // Close the delete modal
+    setShowDeleteModal(false); 
   };
 
   const viewUserDetails = (user) => {
-    setSelectedUser(user); // Set the selected user details
-    setShowDetailModal(true); // Open the detail modal
+    setSelectedUser(user); 
+    setShowDetailModal(true); 
   };
 
   const closeDetailModal = () => {
-    setShowDetailModal(false); // Close the detail modal
+    setShowDetailModal(false); 
   };
 
   return (
-    <div className="m-3">
-      {/* Delete modal */}
+    <div className="m-3 h-screen overflow-y-auto">
       {showDeleteModal && (
         <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="p-6 rounded-lg shadow-lg text-black bg-white justify-center items-center flex flex-col">

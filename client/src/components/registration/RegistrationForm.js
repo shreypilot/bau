@@ -33,73 +33,72 @@ function RegisterForm({ setView, registerRole, setRegisterRole }) {
     setFormData({ ...formData, fileUpload: event.target.files[0] });
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  if (
-    !formData.salutation ||
-    !formData.name ||
-    !formData.fatherName ||
-    !formData.category ||
-    !formData.gender ||
-    !formData.dob ||
-    !formData.email ||
-    !formData.mobileNumber ||
-    !formData.course ||
-    !formData.fileUpload
-  ) {
-    toast.error("Please fill in all the required fields.");
-    return;
-  }
-
-  // Additional validation based on role
-  if (registerRole === "Student") {
-    if (!formData.state || !formData.district) {
-      toast.error("State and District are required for students.");
+    if (
+      !formData.salutation ||
+      !formData.name ||
+      !formData.fatherName ||
+      !formData.category ||
+      !formData.gender ||
+      !formData.dob ||
+      !formData.email ||
+      !formData.mobileNumber ||
+      !formData.course ||
+      !formData.fileUpload
+    ) {
+      toast.error("Please fill in all the required fields.");
       return;
     }
-    if (formData.password !== formData.confirmPassword) {
-      toast.error("Passwords do not match!");
-      return;
-    }
-  } else if (registerRole === "employee") {
-    if (!formData.password || !formData.confirmPassword) {
-      toast.error("Please enter both password fields for employees.");
-      return;
-    }
-  }
 
-  try {
-    const formDataToSend = new FormData();
-    Object.entries(formData).forEach(([key, value]) => {
-      if (key === "dob") {
-        value = value.toISOString().split("T")[0];
+    // Additional validation based on role
+    if (registerRole === "Student") {
+      if (!formData.state || !formData.district) {
+        toast.error("State and District are required for students.");
+        return;
       }
-      formDataToSend.append(key, value);
-    });
-
-    let apiUrl = "";
-    if (registerRole === "student") {
-      apiUrl = "http://localhost:8002/register/user";
+      if (formData.password !== formData.confirmPassword) {
+        toast.error("Passwords do not match!");
+        return;
+      }
     } else if (registerRole === "employee") {
-      apiUrl = "http://localhost:8002/register/employee";
+      if (!formData.password || !formData.confirmPassword) {
+        toast.error("Please enter both password fields for employees.");
+        return;
+      }
     }
 
-    await axios.post(apiUrl, formDataToSend);
-    toast.success("Registration successful!", {
-      onClose: () => {
-        setView("login");
-      },
-    });
-  } catch (error) {
-    if (error.response) {
-      toast.error(error.response.data.error);
-    } else {
-      toast.error("Error occurred during registration.");
-    }
-  }
-};
+    try {
+      const formDataToSend = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        if (key === "dob") {
+          value = value.toISOString().split("T")[0];
+        }
+        formDataToSend.append(key, value);
+      });
 
+      let apiUrl = "";
+      if (registerRole === "student") {
+        apiUrl = "http://localhost:8002/register/user";
+      } else if (registerRole === "employee") {
+        apiUrl = "http://localhost:8002/register/employee";
+      }
+
+      await axios.post(apiUrl, formDataToSend);
+      toast.success("Registration successful!", {
+        onClose: () => {
+          setView("login");
+        },
+      });
+    } catch (error) {
+      if (error.response) {
+        toast.error(error.response.data.error);
+      } else {
+        toast.error("Error occurred during registration.");
+      }
+    }
+  };
 
   return (
     <div>
@@ -265,8 +264,8 @@ const handleSubmit = async (e) => {
         </div>
 
         <div className="flex -mx-3">
-          {registerRole === "student" && (
-            <div className="w-full px-3 mb-3">
+          {registerRole === "student" ? (
+            <div className="w-1/2 px-3 mb-3">
               <label htmlFor="course" className="text-xs font-semibold px-1">
                 Course<span className="text-red-500">*</span>
               </label>
@@ -285,9 +284,8 @@ const handleSubmit = async (e) => {
                 <option value="Ph. D.">Ph. D.</option>
               </select>
             </div>
-          )}
-          {registerRole === "employee" && (
-            <div className="w-full px-3 mb-3">
+          ) : (
+            <div className="w-1/2 px-3 mb-3">
               <label htmlFor="course" className="text-xs font-semibold px-1">
                 Course<span className="text-red-500">*</span>
               </label>
@@ -312,7 +310,7 @@ const handleSubmit = async (e) => {
               </select>
             </div>
           )}
-          <div className="w-full px-3 mb-2">
+          <div className="w-1/2 px-3 mb-2">
             <label htmlFor="fileUpload" className="text-xs font-semibold px-1">
               Upload Image<span className="text-red-500">*</span>
             </label>
@@ -326,7 +324,7 @@ const handleSubmit = async (e) => {
             />
           </div>
         </div>
-        {registerRole === "student" && (
+        {registerRole === "student" ? (
           <>
             <div className="flex -mx-3">
               <div className="w-1/2 px-3 mb-2">
@@ -364,11 +362,10 @@ const handleSubmit = async (e) => {
               </div>
             </div>
           </>
-        )}
-        {registerRole === "employee" && (
+        ):(
           <>
             <div className="flex -mx-3">
-              <div className="w-full px-3 mb-3">
+              <div className="w-1/2 px-3 mb-3">
                 <label
                   htmlFor="password"
                   className="text-xs font-semibold px-1"
@@ -386,7 +383,7 @@ const handleSubmit = async (e) => {
                   required
                 />
               </div>
-              <div className="w-full px-3 mb-2">
+              <div className="w-1/2 px-3 mb-2">
                 <label
                   htmlFor="confirmPassword"
                   className="text-xs font-semibold px-1"

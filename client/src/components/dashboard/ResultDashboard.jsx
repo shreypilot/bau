@@ -54,7 +54,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="m-3">
+    <div className="m-3 h-screen overflow-y-auto">
       <div className="w-full md:w-1/7">
         <div className="overflow-x-auto">
           <h1 className="text-2xl font-bold text-center my-4">
