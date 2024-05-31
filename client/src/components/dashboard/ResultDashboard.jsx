@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
-
 const Dashboard = () => {
   const [data, setData] = useState([]);
 
@@ -57,8 +56,10 @@ const Dashboard = () => {
   return (
     <div className="m-3">
       <div className="w-full md:w-1/7">
-              <div className="overflow-x-auto">
-            <h1 className="text-2xl font-bold text-center my-4">Student Results</h1>
+        <div className="overflow-x-auto">
+          <h1 className="text-2xl font-bold text-center my-4">
+            Student Results
+          </h1>
           <table className="w-11/12 mx-auto">
             <thead className="text-xs text-white uppercase bg-black">
               <tr>
