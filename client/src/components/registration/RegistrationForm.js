@@ -53,7 +53,7 @@ const handleSubmit = async (e) => {
   }
 
   // Additional validation based on role
-  if (registerRole === "student") {
+  if (registerRole === "Student") {
     if (!formData.state || !formData.district) {
       toast.error("State and District are required for students.");
       return;

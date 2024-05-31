@@ -14,7 +14,7 @@ const LoginForm = () => {
   });
   const [loginError, setLoginError] = useState("");
   const [view, setView] = useState("login");
-  const [registerRole, setRegisterRole] = useState("student");
+  const [registerRole, setRegisterRole] = useState("Student");
   const navigate = useNavigate();
   const { login } = useAuth();
 

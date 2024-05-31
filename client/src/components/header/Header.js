@@ -1,38 +1,62 @@
 import React, { useState } from "react";
-import "./header.css";
+import { Link } from "react-router-dom";
+import { RiArrowDropDownLine } from "react-icons/ri";
+import { CgProfile } from "react-icons/cg";
+import { TbLogout } from "react-icons/tb";
 import BauLogo from "../../assets/logo.png";
-// import { Navbar, Container, Nav } from 'react-bootstrap';
-// import { FaSignInAlt, FaSignOutAlt } from 'react-icons/fa';
-// import BauLog from '../../assets/bau-logo.png';
+import "./header.css";
 
 const Header = () => {
-  // State to keep track of user's login status
-  const [isLoggedIn] = useState(false);
+  const [isProfileOptionsOpen, setProfileOptionsOpen] = useState(false);
+ 
+
+  const handleProfileOptionClick = () => {
+    setProfileOptionsOpen(!isProfileOptionsOpen);
+  };
+
+
+
 
   return (
-    <nav class="flex align-center">
-      <img style={{height:'75px',width:'360px'}}
+    <nav className="bg-green-500 py-2 h-28 flex items-center px-4 sticky top-0">
+      <img
+        style={{ height: "75px", width: "360px" }}
         src={BauLogo}
-        // alt="Your Logo"
-      
-        // className="d-inline-block align-top"
+        alt="Logo"
       />
-      <ul>
-        <li class="big-screens">
-          <a href="/home">Home</a>
-          <a href="/">Store</a>
-          <a href="/">About Us</a>
-          <a href="/register" class="btn register">
-            Register
-          </a>
-          <a href="/" class="btn login">
-            Log In
-          </a>
-        </li>
-        <li class="small-screens">
-          <i class="fa-solid fa-bars"></i>
-        </li>
-      </ul>
+      <div className="flex justify-end mx-4 items-center text-white relative">
+        <div className="mx-4">
+          <Link to="/home">Home</Link>
+        </div>
+    
+       
+        <div className="flex rounded-lg p-1">
+          <CgProfile
+            size={36}
+            className="cursor-pointer"
+            onClick={handleProfileOptionClick}
+          />
+          <RiArrowDropDownLine
+            size={36}
+            className="cursor-pointer"
+            onClick={handleProfileOptionClick}
+          />
+        </div>
+       
+        {isProfileOptionsOpen && (
+          <div className="absolute right-0 top-3 mt-10 w-48 bg-white rounded-lg shadow-lg z-10">
+            <div className="py-2 px-2">
+              <Link
+                to="/"
+                className="text-gray-800 pl-2 hover:bg-gray-200 flex items-center hover:text-green-600"
+              >
+                <TbLogout className="mr-2" />
+                Logout
+              </Link>
+            </div>
+          </div>
+        )}
+      </div>
     </nav>
   );
 };

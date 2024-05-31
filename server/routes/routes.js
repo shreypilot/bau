@@ -127,13 +127,13 @@ router.post("/register/user", upload.single("fileUpload"), (req, res) => {
     const image = req.file.filename; // Uploaded file name
 
     // Generate serial number
-    const serialNumber = getNextSerialNumber("employee");
+    const serialNumber = getNextSerialNumber();
 
     // Insert user data into database
     const sql =
       "INSERT INTO student_info (serial_number, salutation, name, father_name, category, gender, dob, email, mobile_number, course, image, state, district) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     const values = [
-      serialNumber,
+      id,
       salutation,
       name,
       fatherName,

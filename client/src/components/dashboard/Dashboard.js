@@ -133,7 +133,7 @@ const Dashboard = () => {
                     scope="row"
                     className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center"
                   >
-                    {item.id}
+                    {item.serial_number}
                   </th>
                   <td className="px-4 py-2 text-center">{item.name}</td>
                   <td className="px-4 py-2 text-center">{item.father_name}</td>
