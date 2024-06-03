@@ -4,13 +4,16 @@ import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import CreateIcon from "@mui/icons-material/Create";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { NavLink } from "react-router-dom";
-
+import NotFound from "../NotFound";
 const Dashboard = () => {
   const [data, setData] = useState([]);
-  const [selectedUserId, setSelectedUserId] = useState(null); 
-  const [showDeleteModal, setShowDeleteModal] = useState(false); 
-  const [showDetailModal, setShowDetailModal] = useState(false); 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [noResults, setNoResults] = useState(false); // State to track if no results are found
 
   useEffect(() => {
     fetchData();
@@ -30,8 +33,8 @@ const Dashboard = () => {
   };
 
   const deleteUser = async (id) => {
-    setSelectedUserId(id); 
-    setShowDeleteModal(true); 
+    setSelectedUserId(id);
+    setShowDeleteModal(true);
   };
 
   const confirmDeleteUser = async () => {
@@ -54,27 +57,53 @@ const Dashboard = () => {
       console.log("User deleted:", deletedData);
 
       setData(data.filter((user) => user.serial_number !== selectedUserId));
-      setShowDeleteModal(false); 
+      setShowDeleteModal(false);
     } catch (error) {
       console.error("Error deleting user:", error);
     }
   };
 
   const closeDeleteModal = () => {
-    setShowDeleteModal(false); 
+    setShowDeleteModal(false);
   };
 
   const viewUserDetails = (user) => {
-    setSelectedUser(user); 
-    setShowDetailModal(true); 
+    setSelectedUser(user);
+    setShowDetailModal(true);
   };
 
   const closeDetailModal = () => {
-    setShowDetailModal(false); 
+    setShowDetailModal(false);
+  };
+
+  const handleSearch = async () => {
+    try {
+      if (searchQuery.trim() !== "") {
+        const response = await fetch(
+          `http://localhost:8002/searchusers?name=${searchQuery}&serial_number=${searchQuery}`
+        );
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const searchData = await response.json();
+        setSearchResults(searchData);
+        setNoResults(searchData.length === 0);
+      } else {
+        setSearchResults([]);
+        setNoResults(false);
+      }
+    } catch (error) {
+      console.error("Error searching users:", error);
+    }
+  };
+
+  const handleChangeSearch = (event) => {
+    setSearchQuery(event.target.value);
   };
 
   return (
     <div className="m-3 h-screen overflow-y-auto">
+      {/* Delete modal */}
       {showDeleteModal && (
         <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="p-6 rounded-lg shadow-lg text-black bg-white justify-center items-center flex flex-col">
@@ -140,93 +169,122 @@ const Dashboard = () => {
 
       <div className="w-full md:w-1/7">
         <div className="overflow-x-auto">
-          <table className="w-11/12 mx-auto">
-            <thead className="text-xs text-white uppercase bg-black">
-              <tr>
-                <th scope="col" className="px-6 py-3 text-center">
-                  Id
-                </th>
-                <th scope="col" className="px-6 py-3 text-center">
-                  Name
-                </th>
-                <th scope="col" className="px-6 py-3 text-center">
-                  Father Name
-                </th>
-                <th scope="col" className="px-6 py-3 text-center">
-                  Email
-                </th>
-                <th scope="col" className="px-6 py-3 text-center">
-                  Course
-                </th>
-                <th scope="col" className="px-6 py-3 text-center">
-                  Gender
-                </th>
-                <th scope="col" className="px-6 py-3 text-center">
-                  Image
-                </th>
-                <th scope="col" className="py-3 text-center">
-                  Action
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((item, index) => (
-                <tr
-                  key={index}
-                  className={`${
-                    index % 2 === 0 ? "bg-white" : "bg-gray-100"
-                  } border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 `}
-                >
-                  <th
-                    scope="row"
-                    className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center"
-                  >
-                    {item.serial_number}
+          <div className="flex justify-between mb-4">
+            <input
+              type="text"
+              placeholder="Search by name or serial number"
+              value={searchQuery}
+              onChange={handleChangeSearch}
+              className="p-2 border border-gray-300 rounded"
+            />
+            <button
+              onClick={handleSearch}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
+              Search
+            </button>
+          </div>
+          {noResults ? (
+            <NotFound />
+          ) : (
+            <table className="w-11/12 mx-auto">
+              <thead className="text-xs text-white uppercase bg-black">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-center">
+                    Id
                   </th>
-                  <td className="px-4 py-2 text-center">{item.name}</td>
-                  <td className="px-4 py-2 text-center">{item.father_name}</td>
-                  <td className="px-4 py-2 text-center">{item.email}</td>
-                  <td className="px-4 py-2 text-center">{item.course}</td>
-                  <td className="px-4 py-2 text-center">{item.gender}</td>
-                  <td className="px-4 py-2 text-center ">
-                    <img
-                      className="w-8 h-8 rounded-full block mx-auto"
-                      src={BAU}
-                      alt="Rounded avatar"
-                    />
-                  </td>
-                  <td className="flex items-center py-2 my-2 justify-center">
-                    <button
-                      className="btn btn-success mr-5"
-                      style={{ padding: "0.25rem 0.1rem", fontSize: "0.4rem" }}
-                      onClick={() => viewUserDetails(item)}
-                    >
-                      <RemoveRedEyeIcon />
-                    </button>
-                    <NavLink to={`/edit/${item.id}`}>
-                      <button
-                        className="btn btn-primary mr-5"
-                        style={{
-                          padding: "0.25rem 0.1rem",
-                          fontSize: "0.4rem",
-                        }}
-                      >
-                        <CreateIcon />
-                      </button>
-                    </NavLink>
-
-                    <button
-                      className="btn btn-danger"
-                      style={{ padding: "0.25rem 0.1rem", fontSize: "0.4rem" }}
-                      onClick={() => deleteUser(item.serial_number)}
-                    >
-                      <DeleteOutlineIcon />
-                    </button>
-                  </td>
+                  <th scope="col" className="px-6 py-3 text-center">
+                    Name
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-center">
+                    Father Name
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-center">
+                    Email
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-center">
+                    Course
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-center">
+                    Gender
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-center">
+                    Image
+                  </th>
+                  <th scope="col" className="py-3 text-center">
+                    Action
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {(searchResults.length > 0 ? searchResults : data).map(
+                  (item, index) => (
+                    <tr
+                      key={index}
+                      className={`${
+                        index % 2 === 0 ? "bg-white" : "bg-gray-100"
+                      } border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 `}
+                    >
+                      <th
+                        scope="row"
+                        className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center"
+                      >
+                        {item.serial_number}
+                      </th>
+                      <td className="px-4 py-2 text-center">{item.name}</td>
+                      <td className="px-4 py-2 text-center">
+                        {item.father_name}
+                      </td>
+                      <td className="px-4 py-2 text-center">{item.email}</td>
+                      <td className="px-4 py-2 text-center">{item.course}</td>
+                      <td className="px-4 py-2 text-center">{item.gender}</td>
+                      <td className="px-4 py-2 text-center ">
+                        <img
+                          className="w-8 h-8 rounded-full block mx-auto"
+                          src={BAU}
+                          alt="Rounded avatar"
+                        />
+                      </td>
+                      <td className="flex items-center py-2 my-2 justify-center">
+                        <button
+                          className="btn btn-success mr-5"
+                          style={{
+                            padding: "0.25rem 0.1rem",
+                            fontSize: "0.4rem",
+                          }}
+                          onClick={() => viewUserDetails(item)}
+                        >
+                          <RemoveRedEyeIcon />
+                        </button>
+                        <NavLink to={`/edit/${item.id}`}>
+                          <button
+                            className="btn btn-primary mr-5"
+                            style={{
+                              padding: "0.25rem 0.1rem",
+                              fontSize: "0.4rem",
+                            }}
+                          >
+                            <CreateIcon />
+                          </button>
+                        </NavLink>
+
+                        <button
+                          className="btn btn-danger"
+                          style={{
+                            padding: "0.25rem 0.1rem",
+                            fontSize: "0.4rem",
+                          }}
+                          onClick={() => deleteUser(item.serial_number)}
+                        >
+                          <DeleteOutlineIcon />
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                )}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>

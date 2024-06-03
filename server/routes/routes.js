@@ -270,8 +270,9 @@ router.get("/searchusers", (req, res) => {
   const values = [];
 
   if (name) {
-    sql += " AND name LIKE ?";
-    values.push(`%${name}%`);
+   sql += " AND name LIKE ?";
+   values.push(`%${name}%`);
+
   }
 
   if (serial_number) {

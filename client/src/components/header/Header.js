@@ -11,7 +11,7 @@ import { useAuth } from "../context/AuthContext";
 
 const Header = () => {
   const [isProfileOptionsOpen, setProfileOptionsOpen] = useState(false);
-  const { currentUser, setCurrentUser } = useAuth();
+  const { setCurrentUser } = useAuth();
 
   const handleProfileOptionClick = () => {
     setProfileOptionsOpen(!isProfileOptionsOpen);
