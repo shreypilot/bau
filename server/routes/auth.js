@@ -22,7 +22,7 @@ router.post("/login", async (req, res) => {
 
     connection.query(
       "SELECT * FROM employees WHERE email = ?",
-      email,
+      [email], // Correctly pass email as an array
       async (err, result) => {
         if (err) {
           throw err;
@@ -33,6 +33,12 @@ router.post("/login", async (req, res) => {
         }
 
         const user = result[0];
+
+        //Check if the user is already logged in
+        if (user.token) {
+          return res.status(403).json({ error: "User is already logged in" });
+        }
+
         const passwordMatch = await bcrypt.compare(password, user.password);
 
         if (passwordMatch) {
@@ -40,7 +46,17 @@ router.post("/login", async (req, res) => {
             expiresIn: "1h",
           });
 
-          res.status(200).json({ message: "Login successful", token });
+          // Save token to the database
+          connection.query(
+            "UPDATE employees SET token = ? WHERE id = ?",
+            [token, user.id],
+            (err) => {
+              if (err) {
+                throw err;
+              }
+              res.status(200).json({ message: "Login successful", token });
+            }
+          );
         } else {
           res.status(401).json({ error: "Incorrect password" });
         }
@@ -49,6 +65,26 @@ router.post("/login", async (req, res) => {
   } catch (error) {
     console.error("Error occurred during login:", error);
     res.status(500).json({ error: "Error occurred during login" });
+  }
+});
+
+router.post("/logout", async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    connection.query(
+      "UPDATE employees SET token = NULL WHERE token = ?",
+      [token], // Correctly pass token as an array
+      (err) => {
+        if (err) {
+          throw err;
+        }
+        res.status(200).json({ message: "Logout successful" });
+      }
+    );
+  } catch (error) {
+    console.error("Error occurred during logout:", error);
+    res.status(500).json({ error: "Error occurred during logout" });
   }
 });
 
@@ -127,7 +163,7 @@ router.post("/register/employee", upload.single("fileUpload"), (req, res) => {
     } = req.body;
     const formattedDOB = new Date(dob).toISOString().split("T")[0];
 
-    const image = req.file.filename; 
+    const image = req.file.filename;
 
     bcrypt.hash(password, 10, (err, hash) => {
       if (err) {
@@ -135,7 +171,7 @@ router.post("/register/employee", upload.single("fileUpload"), (req, res) => {
       }
 
       const sql =
-        "INSERT INTO employees (salutation, name, father_name, department, dob, email, mobile_number, image, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        "INSERT INTO employees (salutation, name, father_name, department, dob, email, mobile_number, image, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
       const values = [
         salutation,
         name,

@@ -1,67 +1,56 @@
-import React, { useState } from "react";
-
+import React from "react";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
-  useLocation,
+  Navigate,
 } from "react-router-dom";
-import { AuthProvider } from "./components/context/AuthContext";
+import { AuthProvider, useAuth } from "./components/context/AuthContext";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
 import LoginForm from "./components/login/LoginForm";
 import Dashboard from "./components/dashboard/Dashboard";
 import EditDashboard from "./components/editDashboard/EditDashboard";
-import ProtectedRoute from "./components/ProtectedRoutes";
 import ResultDashboard from "./components/dashboard/ResultDashboard";
-const Layout = ({ children }) => {
-  const location = useLocation();
-  const isLoginPage = location.pathname === "/";
-  const [searchResults, setSearchResults] = useState([]);
-
-  const handleSearchResults = (results) => {
-    setSearchResults(results);
-  };
-
-  return (
-    <>
-      {!isLoginPage && <Header onSearchResults={handleSearchResults} />}
-      {React.cloneElement(children, { searchResults })}
-      {!isLoginPage && <Footer />}
-    </>
-  );
-};
 
 const App = () => {
   return (
     <AuthProvider>
-      <Router>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<LoginForm />} />
-            <Route
-              path="/home"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/result" element={<ResultDashboard />} />
-            <Route
-              path="/edit/:id"
-              element={
-                <ProtectedRoute>
-                  <EditDashboard />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </Layout>
-      </Router>
+      <AppContent />
     </AuthProvider>
   );
 };
+
+const AppContent = () => {
+  const { currentUser } = useAuth();
+
+  return (
+    <Router>
+      {currentUser && <Header />}
+      <Routes>
+        <Route
+          path="/"
+          element={currentUser ? <Navigate to="/home" /> : <LoginForm />}
+        />
+        <Route
+          path="/home"
+          element={currentUser ? <Dashboard /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/result"
+          element={currentUser ? <ResultDashboard /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/edit/:id"
+          element={currentUser ? <EditDashboard /> : <Navigate to="/" />}
+        />
+      </Routes>
+      {currentUser && <Footer />}
+    </Router>
+  );
+};
+
+
 
 export default App;

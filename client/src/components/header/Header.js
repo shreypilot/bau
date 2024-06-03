@@ -5,12 +5,31 @@ import { CgProfile } from "react-icons/cg";
 import { TbLogout } from "react-icons/tb";
 import BauLogo from "../../assets/logo.png";
 import "./header.css";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useAuth } from "../context/AuthContext";
 
 const Header = () => {
   const [isProfileOptionsOpen, setProfileOptionsOpen] = useState(false);
+  const { currentUser, setCurrentUser } = useAuth();
 
   const handleProfileOptionClick = () => {
     setProfileOptionsOpen(!isProfileOptionsOpen);
+  };
+
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      await axios.post("http://localhost:8002/logout", { token });
+      localStorage.removeItem("token");
+      setCurrentUser(null);
+
+      navigate("/");
+    } catch (error) {
+      alert("Failed to logout");
+    }
   };
 
   return (
@@ -41,13 +60,13 @@ const Header = () => {
         {isProfileOptionsOpen && (
           <div className="absolute right-0 top-3 mt-10 w-48 bg-white rounded-lg shadow-lg z-10">
             <div className="py-2 px-2">
-              <Link
-                to="/"
+              <button
+                onClick={handleLogout}
                 className="text-gray-800 pl-2 hover:bg-gray-200 flex items-center hover:text-green-600"
               >
                 <TbLogout className="mr-2" />
                 Logout
-              </Link>
+              </button>
             </div>
           </div>
         )}

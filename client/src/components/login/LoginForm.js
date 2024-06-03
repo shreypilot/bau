@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import ForgetPassword from "../forgetPassword/ForgetPassword";
 import RegisterForm from "../registration/RegistrationForm";
 import { useAuth } from "../context/AuthContext";
+import axios from "axios";
 
 const LoginForm = () => {
   const [values, setValues] = useState({
@@ -27,35 +28,18 @@ const LoginForm = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    const { email, password } = values;
+
     try {
-      const response = await fetch("http://localhost:8002/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
-
-      const data = await response.json();
-
-       if (response.ok) {
-         console.log("Login successful");
-         toast.success("Login successful!", {
-           onClose: () => {
-        login(data.token);
-             navigate("/home");
-           },
-         });
-       } else {
-         setLoginError(data.error || "Login failed");
-       }
+      const response = await axios.post("http://localhost:8002/login", { email, password });
+      localStorage.setItem("token", response.data.token);
+      login(response.data.token, response.data.user); // Set the token and user in the Auth context
+      navigate("/home");
     } catch (error) {
-      console.error("Error occurred during login:", error);
-      toast.error("Invalid email and password");
+      setLoginError(error.response?.data?.error || "Login failed");
+      toast.error(error.response?.data?.error || "Login failed");
     }
   };
-
-
 
   const renderLogin = () => (
     <form onSubmit={handleSubmit}>
