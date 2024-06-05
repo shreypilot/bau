@@ -4,7 +4,7 @@ import "jspdf-autotable";
 
 const Dashboard = () => {
   const [data, setData] = useState([]);
-  const [editingIndex, setEditingIndex] = useState(-1); // Track the index of the row being edited
+  const [editingIndex, setEditingIndex] = useState(-1); 
 
   useEffect(() => {
     fetchData();
