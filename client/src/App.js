@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -24,10 +24,44 @@ const App = () => {
 
 const AppContent = () => {
   const { currentUser } = useAuth();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [noResults, setNoResults] = useState(false);
 
+  const handleSearch = async () => {
+    try {
+      if (searchQuery.trim() !== "") {
+        const response = await fetch(
+          `http://localhost:8002/searchusers?name=${searchQuery}&serial_number=${searchQuery}`
+        );
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const searchData = await response.json();
+        setSearchResults(searchData);
+        setNoResults(searchData.length === 0);
+      } else {
+        setSearchResults([]);
+        setNoResults(false);
+      }
+    } catch (error) {
+      console.error("Error searching users:", error);
+    }
+  };
+
+  const handleChangeSearch = (event) => {
+    setSearchQuery(event.target.value);
+  };
   return (
     <Router>
-      {currentUser && <Header />}
+      {currentUser && (
+        <Header
+          searchQuery={searchQuery}
+          handleChangeSearch={handleChangeSearch}
+          handleSearch={handleSearch}
+          setSearchQuery={setSearchQuery}
+        />
+      )}
       <Routes>
         <Route
           path="/"
@@ -35,7 +69,13 @@ const AppContent = () => {
         />
         <Route
           path="/home"
-          element={currentUser ? <Dashboard /> : <Navigate to="/" />}
+          element={
+            currentUser ? (
+              <Dashboard noResults={noResults} searchResults={searchResults} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
         <Route path="/result" element={<ResultDashboard />} />
         <Route
@@ -47,7 +87,5 @@ const AppContent = () => {
     </Router>
   );
 };
-
-
 
 export default App;

@@ -17,11 +17,13 @@ const EditDashboard = () => {
     father_name: "",
     category: "",
     gender: "",
-    dob: "",
+    formatted_dob: "",
     email: "",
     mobile_number: "",
     course: "",
     image: null,
+    state: "",
+    district : "",
   });
 
   useEffect(() => {
@@ -59,10 +61,12 @@ const updateuser = async (e) => {
     formData.append("father_name", inpval.father_name);
     formData.append("category", inpval.category);
     formData.append("gender", inpval.gender);
-    formData.append("dob", inpval.dob);
+    formData.append("formatted_dob", inpval.formatted_dob);
     formData.append("email", inpval.email);
     formData.append("mobile_number", inpval.mobile_number);
     formData.append("course", inpval.course);
+    formData.append("course", inpval.state);
+    formData.append("course", inpval.district);
     if (inpval.image) {
       formData.append("image", inpval.image);
     }
@@ -196,17 +200,50 @@ const updateuser = async (e) => {
               </select>
             </div>
             <div className="w-1/2 px-3 mb-2 flex flex-col">
-              <label htmlFor="dob" className="text-xs font-semibold px-1 pb-1">
+              <label htmlFor="formatted_dob" className="text-xs font-semibold px-1 pb-1">
                 Date of Birth<span className="text-red-500">*</span>
               </label>
               <DatePicker
                 dateFormat="dd/MM/yyyy"
-                selected={inpval.dob}
+                selected={inpval.formatted_dob}
                 onChange={(date) =>
-                  setINP((preval) => ({ ...preval, dob: date }))
+                  setINP((preval) => ({ ...preval, formatted_dob: date }))
                 }
-                placeholderText="DD/MM/YYYY"
+                // placeholderText="DD/MM/YYYY"
                 className="w-full px-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="flex -mx-3">
+            <div className="w-1/2 px-3 mb-2">
+              <label htmlFor="state" className="text-xs font-semibold px-1">
+                state<span className="text-red-500">*</span>
+              </label>
+              <input
+                type="state"
+                id="state"
+                name="state"
+                value={inpval.state}
+                onChange={setdata}
+                className="w-full px-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
+                placeholder="John@example.com"
+                required
+              />
+            </div>
+            <div className="w-1/2 px-3 mb-2">
+              <label htmlFor="district" className="text-xs font-semibold px-1">
+                district<span className="text-red-500">*</span>
+              </label>
+              <input
+                type="district"
+                id="district"
+                name="district"
+                value={inpval.district}
+                onChange={setdata}
+                className="w-full px-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
+                placeholder="John@example.com"
                 required
               />
             </div>
@@ -282,7 +319,7 @@ const updateuser = async (e) => {
                 }
                 className="w-full px-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
                 required
-                placeholder={inpval.image }
+                placeholder={inpval.image}
               />
             </div>
           </div>
