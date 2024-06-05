@@ -5,6 +5,9 @@ import CreateIcon from "@mui/icons-material/Create";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { NavLink } from "react-router-dom";
 import NotFound from "../NotFound";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const Dashboard = ({ searchResults, noResults }) => {
   const [data, setData] = useState([]);
 
@@ -73,9 +76,26 @@ const Dashboard = ({ searchResults, noResults }) => {
   const closeDetailModal = () => {
     setShowDetailModal(false);
   };
+   useEffect(() => {
+     fetchData();
+     if (noResults) {
+       toast.error("User not found");
+     }
+   }, [noResults]);
 
   return (
-    <div className="m-3 h-screen overflow-y-auto">
+    <div className="m-3 h-screen overflow-y-auto relative">
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       {showDeleteModal && (
         <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="p-6 rounded-lg shadow-lg text-black bg-white justify-center items-center flex flex-col">
@@ -141,111 +161,110 @@ const Dashboard = ({ searchResults, noResults }) => {
 
       <div className="w-full md:w-1/7">
         <div className="overflow-x-auto">
-          {noResults ? (
-            <NotFound />
-          ) : (
-            <table className="w-full mx-auto">
-              <thead className="text-xs text-white uppercase bg-black">
-                <tr>
-                  <th scope="col" className="px-6 py-3 text-center">
-                    Id
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-center">
-                    Name
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-center">
-                    Father Name
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-center">
-                    Email
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-center">
-                    Course
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-center">
-                    Gender
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-center">
-                    Image
-                  </th>
-                  <th scope="col" className="py-3 text-center">
-                    Action
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {(searchResults.length > 0 ? searchResults : data).map(
-                  (item, index) => (
-                    <tr
-                      key={index}
-                      className={`${
-                        index % 2 === 0 ? "bg-white" : "bg-gray-100"
-                      } border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 `}
+          <table className="w-full mx-auto">
+            <thead className="text-xs text-white uppercase bg-black">
+              <tr>
+                <th scope="col" className="px-6 py-3 text-center">
+                  Id
+                </th>
+                <th scope="col" className="px-6 py-3 text-center">
+                  Name
+                </th>
+                <th scope="col" className="px-6 py-3 text-center">
+                  Father Name
+                </th>
+                <th scope="col" className="px-6 py-3 text-center">
+                  Email
+                </th>
+                <th scope="col" className="px-6 py-3 text-center">
+                  Course
+                </th>
+                <th scope="col" className="px-6 py-3 text-center">
+                  Gender
+                </th>
+                <th scope="col" className="px-6 py-3 text-center">
+                  Image
+                </th>
+                <th scope="col" className="py-3 text-center">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {(searchResults.length > 0 ? searchResults : data).map(
+                (item, index) => (
+                  <tr
+                    key={index}
+                    className={`${
+                      index % 2 === 0 ? "bg-white" : "bg-gray-100"
+                    } border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 `}
+                  >
+                    <th
+                      scope="row"
+                      className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center"
                     >
-                      <th
-                        scope="row"
-                        className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center"
+                      {item.serial_number}
+                    </th>
+                    <td className="px-4 py-2 text-center">{item.name}</td>
+                    <td className="px-4 py-2 text-center">
+                      {item.father_name}
+                    </td>
+                    <td className="px-4 py-2 text-center">{item.email}</td>
+                    <td className="px-4 py-2 text-center">{item.course}</td>
+                    <td className="px-4 py-2 text-center">{item.gender}</td>
+                    <td className="px-4 py-2 text-center ">
+                      <img
+                        className="w-8 h-8 rounded-full block mx-auto"
+                        src={BAU}
+                        alt="Rounded avatar"
+                      />
+                    </td>
+                    <td className="flex items-center py-2 my-2 justify-center">
+                      <button
+                        className="btn btn-success mr-5"
+                        style={{
+                          padding: "0.25rem 0.1rem",
+                          fontSize: "0.4rem",
+                        }}
+                        onClick={() => viewUserDetails(item)}
                       >
-                        {item.serial_number}
-                      </th>
-                      <td className="px-4 py-2 text-center">{item.name}</td>
-                      <td className="px-4 py-2 text-center">
-                        {item.father_name}
-                      </td>
-                      <td className="px-4 py-2 text-center">{item.email}</td>
-                      <td className="px-4 py-2 text-center">{item.course}</td>
-                      <td className="px-4 py-2 text-center">{item.gender}</td>
-                      <td className="px-4 py-2 text-center ">
-                          <img
-                            className="w-8 h-8 rounded-full block mx-auto"
-                          src={BAU}
-                          alt="Rounded avatar"
-                          />
-                      </td>
-                      <td className="flex items-center py-2 my-2 justify-center">
+                        <RemoveRedEyeIcon />
+                      </button>
+                      <NavLink to={`/edit/${item.id}`}>
                         <button
-                          className="btn btn-success mr-5"
+                          className="btn btn-primary mr-5"
                           style={{
                             padding: "0.25rem 0.1rem",
                             fontSize: "0.4rem",
                           }}
-                          onClick={() => viewUserDetails(item)}
                         >
-                          <RemoveRedEyeIcon />
+                          <CreateIcon />
                         </button>
-                        <NavLink to={`/edit/${item.id}`}>
-                          <button
-                            className="btn btn-primary mr-5"
-                            style={{
-                              padding: "0.25rem 0.1rem",
-                              fontSize: "0.4rem",
-                            }}
-                          >
-                            <CreateIcon />
-                          </button>
-                        </NavLink>
+                      </NavLink>
 
-                        <button
-                          className="btn btn-danger"
-                          style={{
-                            padding: "0.25rem 0.1rem",
-                            fontSize: "0.4rem",
-                          }}
-                          onClick={() => deleteUser(item.serial_number)}
-                        >
-                          <DeleteOutlineIcon />
-                        </button>
-                      </td>
-                    </tr>
-                  )
-                )}
-              </tbody>
-            </table>
-          )}
+                      <button
+                        className="btn btn-danger"
+                        style={{
+                          padding: "0.25rem 0.1rem",
+                          fontSize: "0.4rem",
+                        }}
+                        onClick={() => deleteUser(item.serial_number)}
+                      >
+                        <DeleteOutlineIcon />
+                      </button>
+                    </td>
+                  </tr>
+                )
+              )}
+            </tbody>
+          </table>
         </div>
+      
+        
       </div>
     </div>
   );
 };
 
 export default Dashboard;
+

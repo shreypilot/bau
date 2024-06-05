@@ -13,6 +13,7 @@ import LoginForm from "./components/login/LoginForm";
 import Dashboard from "./components/dashboard/Dashboard";
 import EditDashboard from "./components/editDashboard/EditDashboard";
 import ResultDashboard from "./components/dashboard/ResultDashboard";
+import AdmitCard from "./components/admitCard/admitCard";
 
 const App = () => {
   return (
@@ -77,7 +78,7 @@ const AppContent = () => {
             )
           }
         />
-        <Route path="/result" element={<ResultDashboard />} />
+        <Route path="/result" element={<AdmitCard />} />
         <Route
           path="/edit/:id"
           element={currentUser ? <EditDashboard /> : <Navigate to="/" />}
