@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import swami from "../../assets/swami.jpeg";
 import BauLogo from "../../assets/logo.png";
 import sign from "../../assets/Signature.jpg";
@@ -28,46 +30,48 @@ const AdmitCard = () => {
   };
 
   const handleDownload = () => {
-    // Implement download functionality here
-    // For simplicity, let's assume userData contains the necessary information for the admit card
-    // You can create a PDF or an image based on the userData and allow the user to download it
+    if (!userData) {
+      console.error("No user data to download");
+      return;
+    }
+
+    html2canvas(document.querySelector("#admit-card")).then((canvas) => {
+      const imgData = canvas.toDataURL("image/png");
+
+      const pdf = new jsPDF();
+
+      pdf.addImage(imgData, "PNG", 0, 0, 210, 210);
+
+      pdf.save("admit_card.pdf");
+    });
   };
 
   return (
-    <section className="bg-gray-100">
+    <section className="bg-white">
       <div className="container mx-auto">
-        <div className="admit-card border-2 border-black p-6 mb-6">
-          <div className="mb-4">
-            <input
-              type="text"
-              placeholder="Enter email address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="border-2 border-black px-4 py-2"
-            />
-            <button
-              onClick={handleSearch}
-              className="ml-2 px-4 py-2 bg-blue-500 text-white"
-            >
-              Search
-            </button>
-          </div>
-
+        <div className="mt-6 mb-2 flex justify-end">
+          <input
+            type="text"
+            placeholder="Enter email address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="border-2 border-black px-4 py-2"
+          />
+          <button
+            onClick={handleSearch}
+            className="ml-2 px-4 py-2 bg-blue-500 text-white"
+          >
+            Search
+          </button>
+        </div>
+        <div className="  p-6 mb-6">
           {userData && (
             <div>
-              <section className="bg-gray-100">
-                <div className="container mx-auto">
+              <section id="admit-card">
+                <div className="container mx-auto py-10">
                   <div className="admit-card border-2 border-black p-6 mb-6">
-                    <div className="flex justify-between items-center mb-2 ">
-                      <div className="w-1/3 text-center">
-                        <img
-                          src={logo}
-                          alt="Mewar University"
-                          className="h-20 border-2 border-black"
-                        />
-                      </div>
-
-                      <div className="w-1/3 text-center">
+                    <div className="flex justify-center items-center mb-2 ">
+                      <div className=" text-center">
                         <div className="bg-info">
                           <h4 className="uppercase ">
                             Bihar Agricultural University
@@ -80,11 +84,11 @@ const AdmitCard = () => {
                           </h6>
                         </div>
                       </div>
-                      <div className="w-1/3 ">
+                      <div className=" ">
                         <img
                           src={logo}
                           alt="Mewar University"
-                          className="h-20 border-2 border-black "
+                          className="h-20  pr-2 "
                         />
                       </div>
                     </div>
