@@ -4,6 +4,7 @@ import "jspdf-autotable";
 
 const Dashboard = () => {
   const [data, setData] = useState([]);
+  const [editingIndex, setEditingIndex] = useState(-1); // Track the index of the row being edited
 
   useEffect(() => {
     fetchData();
@@ -11,15 +12,29 @@ const Dashboard = () => {
 
   const fetchData = async () => {
     try {
-      const response = await fetch("http://localhost:8002/student_result");
+      const response = await fetch("http://localhost:8002/getusers");
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
       const jsonData = await response.json();
-      setData(jsonData);
+      const initialData = jsonData.map((student) => ({
+        ...student,
+        marks_obtained: null,
+      }));
+      setData(initialData);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
+  };
+
+  const handleEdit = (index) => {
+    setEditingIndex(index);
+  };
+
+  const handleMarksChange = (index, value) => {
+    const updatedData = [...data];
+    updatedData[index].marks_obtained = value;
+    setData(updatedData);
   };
 
   const downloadPDF = () => {
@@ -35,17 +50,11 @@ const Dashboard = () => {
         ],
       ],
       body: data.map(
-        ({
+        ({ name, serial_number, father_name, total_marks, marks_obtained }) => [
           name,
-          registration_number,
+          serial_number,
           father_name,
-          total_marks,
-          marks_obtained,
-        }) => [
-          name,
-          registration_number,
-          father_name,
-          total_marks,
+          "100",
           marks_obtained,
         ]
       ),
@@ -64,10 +73,10 @@ const Dashboard = () => {
             <thead className="text-xs text-white uppercase bg-black">
               <tr>
                 <th scope="col" className="px-6 py-3 text-center">
-                  Name
+                  serial Number
                 </th>
                 <th scope="col" className="px-6 py-3 text-center">
-                  Registration Number
+                  Name
                 </th>
                 <th scope="col" className="px-6 py-3 text-center">
                   Father Name
@@ -88,14 +97,30 @@ const Dashboard = () => {
                     index % 2 === 0 ? "bg-white" : "bg-gray-100"
                   } border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 `}
                 >
-                  <td className="px-4 py-2 text-center">{item.name}</td>
                   <td className="px-4 py-2 text-center">
-                    {item.registration_number}
+                    {item.serial_number}
                   </td>
+                  <td className="px-4 py-2 text-center">{item.name}</td>
                   <td className="px-4 py-2 text-center">{item.father_name}</td>
-                  <td className="px-4 py-2 text-center">{item.total_marks}</td>
-                  <td className="px-4 py-2 text-center">
-                    {item.marks_obtained}
+                  <td className="px-4 py-2 text-center">100</td>
+                  <td className="px-4 py-2 text-center ">
+                    {editingIndex === index ? (
+                      <input
+                        type="value"
+                        value={item.marks_obtained || ""}
+                        onChange={(e) =>
+                          handleMarksChange(index, e.target.value)
+                        }
+                        className="w-16 text-center border border-blue-500 "
+                      />
+                    ) : (
+                      <span
+                        onClick={() => handleEdit(index)}
+                        className="border-1 border-blue-500 px-4"
+                      >
+                          {item.marks_obtained || "0"}
+                      </span>
+                    )}
                   </td>
                 </tr>
               ))}

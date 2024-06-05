@@ -169,7 +169,7 @@ const Dashboard = () => {
 
       <div className="w-full md:w-1/7">
         <div className="overflow-x-auto">
-          <div className="flex justify-between mb-4">
+          <div className="flex justify-end gap-2 mb-4">
             <input
               type="text"
               placeholder="Search by name or serial number"
@@ -187,7 +187,7 @@ const Dashboard = () => {
           {noResults ? (
             <NotFound />
           ) : (
-            <table className="w-11/12 mx-auto">
+            <table className="w-full mx-auto">
               <thead className="text-xs text-white uppercase bg-black">
                 <tr>
                   <th scope="col" className="px-6 py-3 text-center">

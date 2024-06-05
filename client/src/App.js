@@ -37,10 +37,7 @@ const AppContent = () => {
           path="/home"
           element={currentUser ? <Dashboard /> : <Navigate to="/" />}
         />
-        <Route
-          path="/result"
-          element={currentUser ? <ResultDashboard /> : <Navigate to="/" />}
-        />
+        <Route path="/result" element={<ResultDashboard />} />
         <Route
           path="/edit/:id"
           element={currentUser ? <EditDashboard /> : <Navigate to="/" />}
