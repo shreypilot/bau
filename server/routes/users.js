@@ -17,15 +17,28 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.get("/getusers", (req, res) => {
-  connection.query("SELECT * FROM student_info", (err, result) => {
+  let sql = "SELECT * FROM student_info";
+
+  const email = req.query.email;
+  if (email) {
+    sql += " WHERE email = ?";
+  }
+
+  connection.query(sql, [email], (err, result) => {
     if (err) {
-      console.error("Error occurred while fetching users:", err);
-      res.status(500).json({ error: "Error occurred while fetching users" });
+      console.error("Error occurred while fetching user data:", err);
+      res
+        .status(500)
+        .json({ error: "Error occurred while fetching user data" });
     } else {
+      if (result.length === 0) {
+        return res.status(404).json({ error: "User not found" });
+      }
       res.status(200).json(result);
     }
   });
 });
+
 router.get("/student_result", (req, res) => {
   connection.query("SELECT * FROM student_result", (err, result) => {
     if (err) {

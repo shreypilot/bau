@@ -78,7 +78,8 @@ const AppContent = () => {
             )
           }
         />
-        <Route path="/result" element={<AdmitCard />} />
+        <Route path="/result" element={<ResultDashboard />} />
+        <Route path="/admitcard" element={<AdmitCard />} />
         <Route
           path="/edit/:id"
           element={currentUser ? <EditDashboard /> : <Navigate to="/" />}
