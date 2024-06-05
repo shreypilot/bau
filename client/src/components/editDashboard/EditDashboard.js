@@ -1,15 +1,14 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams, NavLink } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { NavLink, useParams } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-
+import { FaPen } from "react-icons/fa";
 const EditDashboard = () => {
   const { id } = useParams();
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const [inpval, setINP] = useState({
     salutation: "",
@@ -23,7 +22,7 @@ const EditDashboard = () => {
     course: "",
     image: null,
     state: "",
-    district : "",
+    district: "",
   });
 
   useEffect(() => {
@@ -51,58 +50,88 @@ const EditDashboard = () => {
     }));
   };
 
-const updateuser = async (e) => {
-  e.preventDefault();
+  const updateuser = async (e) => {
+    e.preventDefault();
 
-  try {
-    const formData = new FormData();
-    formData.append("salutation", inpval.salutation);
-    formData.append("name", inpval.name);
-    formData.append("father_name", inpval.father_name);
-    formData.append("category", inpval.category);
-    formData.append("gender", inpval.gender);
-    formData.append("formatted_dob", inpval.formatted_dob);
-    formData.append("email", inpval.email);
-    formData.append("mobile_number", inpval.mobile_number);
-    formData.append("course", inpval.course);
-    formData.append("course", inpval.state);
-    formData.append("course", inpval.district);
-    if (inpval.image) {
-      formData.append("image", inpval.image);
+    try {
+      const formData = new FormData();
+      formData.append("salutation", inpval.salutation);
+      formData.append("name", inpval.name);
+      formData.append("father_name", inpval.father_name);
+      formData.append("category", inpval.category);
+      formData.append("gender", inpval.gender);
+      formData.append("formatted_dob", inpval.formatted_dob);
+      formData.append("email", inpval.email);
+      formData.append("mobile_number", inpval.mobile_number);
+      formData.append("course", inpval.course);
+      formData.append("course", inpval.state);
+      formData.append("course", inpval.district);
+      if (inpval.image) {
+        formData.append("image", inpval.image);
+      }
+
+      const res = await axios.patch(
+        `http://localhost:8002/updateuser/${id}`,
+        formData
+      );
+
+      const data = res.data;
+      if (res.status === 200) {
+        console.log(data);
+        toast.success("Profile updated successfully", {
+          onClose: () => {
+            navigate("/home");
+          },
+        });
+      } else {
+        toast.error("Failed to update profile");
+      }
+    } catch (error) {
+      console.error("Error occurred during profile update:", error.message);
+      toast.error("Error occurred during profile update");
     }
-
-    const res = await axios.patch(
-      `http://localhost:8002/updateuser/${id}`,
-      formData
-    );
-
-    const data = res.data;
-    if (res.status === 200) {
-      console.log(data);
-      toast.success("Profile updated successfully", {
-        onClose: () => {
-          navigate("/home");
-        },
-      });
-
-    } else {
-      toast.error("Failed to update profile");
-    }
-  } catch (error) {
-    console.error("Error occurred during profile update:", error.message);
-    toast.error("Error occurred during profile update");
-  }
-};
-
+  };
 
   return (
-    <div className="flex justify-center items-center h-full mt-3 mb-3">
+    <div className="flex flex-col justify-center items-center h-full mt-3 mb-3">
       <div className="w-full md:w-1/2 py-10 px-10 md:px-10 border border-gray-800 rounded-lg">
         <div className="text-center mb-2">
           <h1 className="font-bold text-3xl text-gray-900">UPDATE NOW</h1>
           <p>Enter your information to register</p>
         </div>
         <form>
+          <div className="mx-auto relative w-32 h-32 border-4 border-white rounded-full overflow-hidden z-10">
+            <img
+              src={
+                inpval.image
+                  ? URL.createObjectURL(inpval.image)
+                  : "https://www.ihna.edu.au/blog/wp-content/uploads/2022/10/user-dummy-800x789.png"
+              }
+              alt="Profile"
+            />
+
+            <div className="absolute bottom-0 right-10 flex items-center justify-center">
+              <label
+                htmlFor="image"
+                className="text-white bg-blue-100 rounded-full p-2 cursor-pointer"
+              >
+                <FaPen />
+                <input
+                  type="file"
+                  id="image"
+                  name="image"
+                  className="hidden"
+                  onChange={(e) =>
+                    setINP((preval) => ({
+                      ...preval,
+                      image: e.target.files[0],
+                    }))
+                  }
+                />
+              </label>
+            </div>
+          </div>
+         
           <div className="flex -mx-3">
             <div className="w-1/2 px-3 mb-2">
               <label
@@ -200,7 +229,10 @@ const updateuser = async (e) => {
               </select>
             </div>
             <div className="w-1/2 px-3 mb-2 flex flex-col">
-              <label htmlFor="formatted_dob" className="text-xs font-semibold px-1 pb-1">
+              <label
+                htmlFor="formatted_dob"
+                className="text-xs font-semibold px-1 pb-1"
+              >
                 Date of Birth<span className="text-red-500">*</span>
               </label>
               <DatePicker
@@ -209,45 +241,13 @@ const updateuser = async (e) => {
                 onChange={(date) =>
                   setINP((preval) => ({ ...preval, formatted_dob: date }))
                 }
-                // placeholderText="DD/MM/YYYY"
+                placeholderText="DD/MM/YYYY"
                 className="w-full px-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
                 required
               />
             </div>
           </div>
 
-          <div className="flex -mx-3">
-            <div className="w-1/2 px-3 mb-2">
-              <label htmlFor="state" className="text-xs font-semibold px-1">
-                state<span className="text-red-500">*</span>
-              </label>
-              <input
-                type="state"
-                id="state"
-                name="state"
-                value={inpval.state}
-                onChange={setdata}
-                className="w-full px-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
-                placeholder="John@example.com"
-                required
-              />
-            </div>
-            <div className="w-1/2 px-3 mb-2">
-              <label htmlFor="district" className="text-xs font-semibold px-1">
-                district<span className="text-red-500">*</span>
-              </label>
-              <input
-                type="district"
-                id="district"
-                name="district"
-                value={inpval.district}
-                onChange={setdata}
-                className="w-full px-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
-                placeholder="John@example.com"
-                required
-              />
-            </div>
-          </div>
           <div className="flex -mx-3">
             <div className="w-1/2 px-3 mb-2">
               <label htmlFor="email" className="text-xs font-semibold px-1">
@@ -284,6 +284,38 @@ const updateuser = async (e) => {
             </div>
           </div>
           <div className="flex -mx-3">
+            <div className="w-1/2 px-3 mb-2">
+              <label htmlFor="state" className="text-xs font-semibold px-1">
+                state<span className="text-red-500">*</span>
+              </label>
+              <input
+                type="state"
+                id="state"
+                name="state"
+                value={inpval.state}
+                onChange={setdata}
+                className="w-full px-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
+                placeholder="John@example.com"
+                required
+              />
+            </div>
+            <div className="w-1/2 px-3 mb-2">
+              <label htmlFor="district" className="text-xs font-semibold px-1">
+                district<span className="text-red-500">*</span>
+              </label>
+              <input
+                type="district"
+                id="district"
+                name="district"
+                value={inpval.district}
+                onChange={setdata}
+                className="w-full px-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
+                placeholder="John@example.com"
+                required
+              />
+            </div>
+          </div>
+          <div className="flex -mx-3">
             <div className="w-full px-3 mb-3">
               <label htmlFor="course" className="text-xs font-semibold px-1">
                 Course<span className="text-red-500">*</span>
@@ -303,7 +335,7 @@ const updateuser = async (e) => {
                 <option value="Ph. D.">Ph. D.</option>
               </select>
             </div>
-            <div className="w-full px-3 mb-2">
+            {/* <div className="w-full px-3 mb-2">
               <label htmlFor="image" className="text-xs font-semibold px-1">
                 Upload Image<span className="text-red-500">*</span>
               </label>
@@ -321,7 +353,7 @@ const updateuser = async (e) => {
                 required
                 placeholder={inpval.image}
               />
-            </div>
+            </div> */}
           </div>
 
           <div className="flex -mx-3">
